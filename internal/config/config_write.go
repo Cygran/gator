@@ -5,16 +5,20 @@ import (
 	"os"
 )
 
-func write(cfg *Config) error {
-	jsonData, err := json.Marshal(cfg)
+func write(cfg Config) error {
+	fullPath, err := getConfigFilePath()
 	if err != nil {
 		return err
 	}
-	filePath, err := getConfigFilePath()
+
+	file, err := os.Create(fullPath)
 	if err != nil {
 		return err
 	}
-	err = os.WriteFile(filePath, jsonData, 0644)
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+	err = encoder.Encode(cfg)
 	if err != nil {
 		return err
 	}

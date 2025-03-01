@@ -11,14 +11,16 @@ func Read() (Config, error) {
 	if err != nil {
 		return Config{}, errors.New("unable to get config file path")
 	}
-	contents, err := os.ReadFile(configFile)
+	contents, err := os.Open(configFile)
 	if err != nil {
 		return Config{}, errors.New("error reading config file")
 	}
-	config := Config{}
-	err = json.Unmarshal(contents, &config)
+	defer contents.Close()
+	decoder := json.NewDecoder(contents)
+	cfg := Config{}
+	err = decoder.Decode(&cfg)
 	if err != nil {
 		return Config{}, err
 	}
-	return config, nil
+	return cfg, nil
 }
