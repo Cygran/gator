@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"os"
 
+	"github.com/cygran/gator/internal/cli"
 	"github.com/cygran/gator/internal/config"
 )
 
@@ -10,16 +12,29 @@ func main() {
 	cfg, err := config.Read()
 	if err != nil {
 		fmt.Printf("Failed to read config file: %v\n", err)
+		os.Exit(1)
 	}
-	cfg.SetUser("Cygran")
-	if err != nil {
-		fmt.Printf("Failed to complete setting user: %v\n", err)
-		return
+	state := &cli.State{
+		Config: &cfg,
 	}
-	cfg, err = config.Read()
-	if err != nil {
-		fmt.Printf("Failed to read updated config file: %v\n", err)
-		return
+	cmds := &cli.Commands{
+		Handlers: make(map[string]func(*cli.State, cli.Command) error),
 	}
-	fmt.Printf("Config successfully updated: %+v\n", cfg)
+	cmds.Register("login", cli.HandlerLogin)
+	if len(os.Args) < 2 {
+		fmt.Println("Error: not enough arguments")
+		os.Exit(1)
+	}
+	cmdName := os.Args[1]
+	cmdArgs := os.Args[2:]
+	cmd := cli.Command{
+		Name: cmdName,
+		Args: cmdArgs,
+	}
+
+	if err := cmds.Run(state, cmd); err != nil {
+		fmt.Printf("Error: %v\n", err)
+		os.Exit(1)
+	}
+
 }
