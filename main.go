@@ -33,6 +33,7 @@ func main() {
 	cmds.Register("register", cli.HandlerRegister)
 	cmds.Register("reset", cli.HandlerResetUsers)
 	cmds.Register("users", cli.HandlerUsers)
+	cmds.Register("agg", cli.HandlerAgg)
 	if len(os.Args) < 2 {
 		fmt.Println("Error: not enough arguments")
 		os.Exit(1)
