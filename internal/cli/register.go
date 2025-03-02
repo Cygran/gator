@@ -34,11 +34,9 @@ func HandlerRegister(s *State, cmd Command) error {
 			fmt.Printf("User %s created successfully!\nUser details: %+v\n", userName, user)
 			return nil
 		} else {
-			// Something went wrong (e.g., database issue).
 			return fmt.Errorf("error fetching user: %w", err)
 		}
 	} else {
-		// The user already exists, so exit with an error.
 		return fmt.Errorf("user %s already exists", userName)
 	}
 }
