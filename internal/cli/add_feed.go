@@ -16,8 +16,7 @@ func HandlerAddFeed(s *State, cmd Command) error {
 	}
 	name := cmd.Args[0]
 	url := cmd.Args[1]
-	userName := s.Config.CurrentUserName
-	user, err := s.Db.GetUser(context.Background(), userName)
+	user, err := s.Db.GetUser(context.Background(), s.Config.CurrentUserName)
 	if err != nil {
 		return fmt.Errorf("error getting user: %w", err)
 	}
@@ -33,5 +32,16 @@ func HandlerAddFeed(s *State, cmd Command) error {
 		return fmt.Errorf("error adding feed: %w", err)
 	}
 	fmt.Printf("Feed added successfully: %+v\n", feed)
+	_, err = s.Db.CreateFeedFollow(context.Background(), database.CreateFeedFollowParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now().UTC(),
+		UpdatedAt: time.Now().UTC(),
+		UserID:    user.ID,
+		FeedID:    feed.ID,
+	})
+	if err != nil {
+		return fmt.Errorf("feed added but failed to follow")
+	}
+	fmt.Printf("feed added and followed successfully: %+v\n", feed)
 	return nil
 }
