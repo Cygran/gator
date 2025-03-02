@@ -10,11 +10,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func HandlerFollow(s *State, cmd Command) error {
-	user, err := s.Db.GetUser(context.Background(), s.Config.CurrentUserName)
-	if err != nil {
-		return err
-	}
+func HandlerFollow(s *State, cmd Command, user database.User) error {
 	if len(cmd.Args) == 0 {
 		return fmt.Errorf("url required")
 	}

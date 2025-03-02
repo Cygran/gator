@@ -3,13 +3,11 @@ package cli
 import (
 	"context"
 	"fmt"
+
+	"github.com/cygran/gator/internal/database"
 )
 
-func HandlerFollowing(s *State, cmd Command) error {
-	user, err := s.Db.GetUser(context.Background(), s.Config.CurrentUserName)
-	if err != nil {
-		return err
-	}
+func HandlerFollowing(s *State, cmd Command, user database.User) error {
 	followList, err := s.Db.GetFeedFollowsForUser(context.Background(), user.ID)
 	if err != nil {
 		return fmt.Errorf("failed to get followed feed list for %v", user.Name)
