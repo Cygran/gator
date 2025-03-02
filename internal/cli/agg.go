@@ -1,17 +1,22 @@
 package cli
 
 import (
-	"context"
 	"fmt"
+	"time"
 
-	"github.com/cygran/gator/internal/rss"
+	"github.com/cygran/gator/internal/aggregator"
 )
 
 func HandlerAgg(s *State, cmd Command) error {
-	feed, err := rss.FetchFeed(context.Background(), "https://www.wagslane.dev/index.xml")
-	if err != nil {
-		return err
+	if len(cmd.Args) == 0 {
+		return fmt.Errorf("require a time between requests")
 	}
-	fmt.Printf("%+v\n", feed)
-	return nil
+	timeBetweenRequests, err := time.ParseDuration(cmd.Args[0])
+	if err != nil {
+		return fmt.Errorf("failed to parse request frequency: %v", err)
+	}
+	ticker := time.NewTicker(timeBetweenRequests)
+	for ; ; <-ticker.C {
+		aggregator.ScrapeFeeds(s.Db)
+	}
 }
